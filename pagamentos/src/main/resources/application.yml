@@ -1,0 +1,48 @@
+
+
+spring:
+  application:
+    name: pagamentos-ms
+  flyway:
+    enabled: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/alurafood-pagamento?createDatabaseIfNotExist=true
+    username: root
+    password: teste123
+  jpa:
+    show-sql: true
+logging:
+  level:
+    sql: debug
+    web: debug
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    instance-id: ${spring.application.name}-${random.uuid}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /pagamentos/actuator/
+# https://resilience4j.readme.io/docs/circuitbreaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      atualizaPedido:
+        slidingWindowSize: 3 # a partir de quantas requisições altera o estado do circuit breaker
+        minimumNumberOfCalls: 2 # depois de 2 requisições para de fazer requisição
+        waitDurationInOpenState: 50s # quando o circuit breaker permite chegar na requisição após bloqueio
+        failureRateThreshold: 50 # em porcentagem, significa se as requisições com falhas exceder 50% do slidingWindowSize o circuit breaker é ativado e o endpoint entra em modo OPEN
+  retry:
+    instances:
+      atualizaPedido:
+        maxAttempts: 3
+        waitDuration: 10s
+propriedade:
+  a: ${JAVA_HOME} # testar vari�veis de ambiente
