@@ -1,0 +1,16 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=saviom
+      - RABBITMQ_DEFAULT_PASS=alura
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq/
+
+volumes:
+  rabbitdata: {}

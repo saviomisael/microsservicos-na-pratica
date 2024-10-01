@@ -5,6 +5,8 @@ import br.com.alurafood.pagamentos.service.PagamentoService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,9 @@ import java.net.URI;
 public class PagamentoController {
     @Autowired
     private PagamentoService service;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Value("${propriedade.a}")
     private String env;
@@ -46,6 +51,11 @@ public class PagamentoController {
     public ResponseEntity<PagamentoDto> cadastrar(@RequestBody @Valid PagamentoDto dto, UriComponentsBuilder uriBuilder) {
         PagamentoDto pagamento = service.criarPagamento(dto);
         URI endereco = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
+
+        var message = new Message(("Criei um pagamento com o id " + pagamento.getId()).getBytes());
+
+        // mandando para a fanout chega no listener de pagamento e no listener de avaliação
+        rabbitTemplate.convertAndSend("pagamentos.ex", "", pagamento);
 
         return ResponseEntity.created(endereco).body(pagamento);
     }

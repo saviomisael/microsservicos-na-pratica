@@ -1,6 +1,9 @@
-
-
 spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: saviom
+    password: alura
   application:
     name: pagamentos-ms
   flyway:
@@ -45,4 +48,4 @@ resilience4j:
         maxAttempts: 3
         waitDuration: 10s
 propriedade:
-  a: ${JAVA_HOME} # testar vari�veis de ambiente
+  a: ${JAVA_HOME} # testar variáveis de ambiente
