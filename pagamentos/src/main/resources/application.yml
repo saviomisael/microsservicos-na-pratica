@@ -1,4 +1,7 @@
 spring:
+  threads:
+    virtual:
+      enabled: true
   rabbitmq:
     host: localhost
     port: 5672
